@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>レシピ投稿完了</title>
+	<script th:src="@{/js/common.js}"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+	<link rel="stylesheet" th:href="@{/css/temp.css}" />
+	<link rel="stylesheet" th:href="@{/css/insertRecipeResult.css}" />
+</head>
+
+<body>
+	<!-- header -->
+	<nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary border-bottom p-4"
+		style="background-color: #ffffff;">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/recommend}" style="font-size: 40px">CookUp</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+				<ul class="navbar-nav mb-2 mb-lg-0">
+					<!-- classに"active"とつけてあげると、その項目は強調表示されます。このテンプレの場合は「Myレシピ」が強調表示されてます" -->
+					<!-- hrefでjsを呼んでます。あくまで例なので修正の必要はありそう。 -->
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="select" value="検索">
+							<a class="nav-link" href="javascript:selectSubmit()">検索</a>
+						</form>
+					</li>
+					<!-- ここから下はsubmitになっていない(画面遷移の確認だけしている)ため、適宜上を真似して実装してみてください。変更したらご一報ください。 -->
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="#" value="Myレシピ">
+							<a class="nav-link" aria-current="page" th:href="@{/Myrecipe}">Myレシピ</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="#" value="投稿">
+							<a class="nav-link active" aria-current="page" th:href="@{/insertRecipeInput}">投稿</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="#" value="カレンダー">
+							<a class="nav-link" aria-current="page" th:href="@{/calendar}">カレンダー</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<button type="button" onclick="logoutSubmit()"
+							class="btn btn-primary btn-lg sign">ログアウト</button>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<img th:src="@{${userIcon}}" alt="icon" width="100" height="100">
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- /header -->
+
+	<!-- 
+		コンテンツはこちらに表示されます 
+		コンテンツはこちらに表示されます 
+		コンテンツはこちらに表示されます 
+		コンテンツはこちらに表示されます 
+		コンテンツはこちらに表示されます 
+	-->
+	<main>
+
+		<table>
+			<div class="container">
+				<center>
+					<!-- footer -->
+					<h1>レシピの投稿が完了しました！</h1>
+
+					<br>
+					<form style="display: inline;">
+						<input type="hidden" name="#" value="メニュー">
+						<a class="nav-link" aria-current="page" th:href="@{/recommend}">メニューに戻る</a>
+					</form>
+
+				</center>
+
+			</div>
+		</table>
+
+	</main>
+
+	<!-- footer -->
+	<footer>
+		<p>© 2024 CookUp</p>
+	</footer>
+	<!-- footer -->
+	<!-- スクリプト-->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		function selectSubmit() {
+			const form = document.createElement('form');
+			form.setAttribute('method', 'post');
+			form.setAttribute('action', 'selectRecipe');
+
+			// 動的送信用のHidden
+			// 動的にFormを作成する場合は何かしら送信しないと、正しく動作しない
+			const inputField = document.createElement("input");
+			inputField.setAttribute("type", "hidden");
+			inputField.setAttribute("value", "select");
+
+			form.appendChild(inputField);
+
+			// フォームをDOMに追加
+			document.body.appendChild(form);
+
+			form.submit();
+		}
+	</script>
+	<!-- スクリプト-->
+</body>
+
+</html>
