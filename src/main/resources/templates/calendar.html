@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>カレンダー</title>
+	<script th:src="@{/js/common.js}"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+	<link rel="stylesheet" th:href="@{/css/temp.css}" />
+	<link rel="stylesheet" th:href="@{/css/calendar.css}" />
+</head>
+
+<body>
+	<!-- header -->
+	<nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary border-bottom p-4"
+		style="background-color: #ffffff;">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/recommend}" style="font-size: 40px">CookUp</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+				<ul class="navbar-nav mb-2 mb-lg-0">
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="select" value="検索">
+							<a class="nav-link" href="javascript:selectSubmit()">検索</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="#" value="Myレシピ">
+							<a class="nav-link" aria-current="page" th:href="@{/Myrecipe}">Myレシピ</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="#" value="投稿">
+							<a class="nav-link" aria-current="page" th:href="@{/insertRecipeInput}">投稿</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center">
+						<form>
+							<input type="hidden" name="#" value="カレンダー">
+							<a class="nav-link active" aria-current="page" th:href="@{/calendar}">カレンダー</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center"> <button type="button"
+							onclick="logoutSubmit()" class="btn btn-primary btn-lg sign">ログアウト</button>
+					</li>
+					<li class="nav-item p-2 h4 d-flex align-items-center"> <img th:src="@{${userIcon}}" alt="icon"
+							width="100" height="100">
+					</li>
+
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!-- /header -->
+
+	<main>
+		<div class="container">
+			<h2>
+				<span class="uline">カレンダー</span><span class="small">Calendar</span>
+			</h2>
+
+			<div class="calendar">
+				<div class="calendar-header">
+					<button id="prevMonthBtn">&lt;</button>
+					<h2 id="monthYear"></h2>
+					<button id="nextMonthBtn">&gt;</button>
+				</div>
+				<div id="calendarDays" class="day-names">
+					<div class="sunday-text day-header">日</div>
+					<div class="day-header">月</div>
+					<div class="day-header">火</div>
+					<div class="day-header">水</div>
+					<div class="day-header">木</div>
+					<div class="day-header">金</div>
+					<div class="saturday-text day-header">土</div>
+				</div>
+				<div class="calendar-body" id="calendarBody">
+					<!-- JavaScriptで日付を挿入 -->
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<h2>
+				<span class="uline">スケジュール</span><span class="small">Schedule</span>
+			</h2>
+		</div>
+
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th style="width: 300px;">登録日</th>
+						<th>レシピタイトル</th>
+						<th style="width: 300px;">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="calendar : ${calendars}">
+						<td
+							th:text="${#temporals.format(T(java.time.LocalDate).parse(calendar.calDate), 'yyyy-MM-dd (E)', #locale)}">
+						</td>
+						<td>
+							<span th:each="recipe : ${RecipeList}">
+								<a th:if="${calendar.idUser == recipe.idUser}"
+									th:href="@{/recipeDetailFromMyRecipe(idRecipeValue=${calendar.idRecipe})}"
+									style="font-size:24px">
+									<span th:if="${recipe.idRecipe == calendar.idRecipe}"
+										th:text="${recipe.nmRecipe}"></span>
+								</a>
+								<a th:unless="${calendar.idUser == recipe.idUser}"
+									th:href="@{/recipeDetailFromSearch(idRecipeValue=${calendar.idRecipe})}"
+									style="font-size:24px">
+									<span th:if="${recipe.idRecipe == calendar.idRecipe}"
+										th:text="${recipe.nmRecipe}"></span>
+								</a>
+							</span>
+						</td>
+						<td>
+							<form action="#" th:action="@{/calendarDelete}" method="post"
+								onsubmit="return confirm('本当に削除しますか？');" style="display: inline;">
+								<input type="hidden" name="calDate" th:value="${calendar.calDate}">
+								<input type="submit" value="削除" style="background-color: #dc3545;"
+									onmouseover="this.style.backgroundColor='rgb(154, 27, 39)';"
+									onmouseout="this.style.backgroundColor='#dc3545';">
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
+	</main>
+	<footer>
+		<p>© 2024 CookUp</p>
+	</footer>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
+	<script th:inline="javascript">
+		document.addEventListener('DOMContentLoaded', function () {
+			// Thymeleafから渡されたデータを変換してJavaScriptで使用
+			var recipeList = /*[[${RecipeList}]]*/[];
+			var calendars = /*[[${calendars}]]*/[];
+
+			// デバッグ用
+			console.log('Recipe List:', recipeList);
+			console.log('Calendars:', calendars);
+
+			let currentDate = new Date();
+			let currentMonth = currentDate.getMonth();
+			let currentYear = currentDate.getFullYear();
+			let today = currentDate.getDate(); // 今日の日付を取得
+
+			function getDaysInMonth(month, year) {
+				return new Date(year, month + 1, 0).getDate();
+			}
+
+			function generateCalendar(month, year) {
+				let calendarBody = document.getElementById('calendarBody');
+				calendarBody.innerHTML = '';
+
+				let firstDay = new Date(year, month, 1);
+				let startingDay = firstDay.getDay();
+
+				// 空白の日付を挿入
+				for (let i = 0; i < startingDay; i++) {
+					let dayDiv = document.createElement('div');
+					dayDiv.classList.add('calendar-day', 'day-header');
+					calendarBody.appendChild(dayDiv);
+				}
+
+				let totalDays = getDaysInMonth(month, year);
+				for (let i = 1; i <= totalDays; i++) {
+					let dayDiv = document.createElement('div');
+					dayDiv.classList.add('calendar-day');
+					dayDiv.textContent = i;
+					dayDiv.setAttribute('data-day', i);
+
+					let dateStr = `${year}-${('0' + (month + 1)).slice(-2)}-${('0' + i).slice(-2)}`;
+
+					// 今日の日付にクラスを追加
+					if (i === today && month === currentMonth && year === currentYear) {
+						dayDiv.classList.add('today');
+					}
+
+					// 日付に関連するレシピを抽出
+					let recipesForDate = calendars
+						.filter(calendar => calendar.calDate === dateStr)
+						.map(calendar => recipeList.find(recipe => recipe.idRecipe === calendar.idRecipe))
+						.filter(recipe => recipe !== undefined);
+
+					if (recipesForDate.length > 0) {
+						dayDiv.innerHTML += `<div class="recipe-info">${recipesForDate.map(recipe => {
+							let recipeLink = recipe.idUser === (calendars.find(c => c.calDate === dateStr) || {}).idUser
+								? '/recipeDetailFromMyRecipe?idRecipeValue=' + recipe.idRecipe
+								: '/recipeDetailFromSearch?idRecipeValue=' + recipe.idRecipe;
+							return `
+                <div style="font-size: 12px;">
+                    <a href="${recipeLink}">
+                        ${recipe.nmRecipe}
+                    </a>
+                </div>`;
+						}).join('')}</div>`;
+					}
+
+					calendarBody.appendChild(dayDiv);
+				}
+
+				document.getElementById('monthYear').textContent = `${year}年 ${month + 1}月`;
+			}
+
+			function previousMonth() {
+				currentMonth--;
+				if (currentMonth < 0) {
+					currentMonth = 11;
+					currentYear--;
+				}
+				generateCalendar(currentMonth, currentYear);
+			}
+
+			function nextMonth() {
+				currentMonth++;
+				if (currentMonth > 11) {
+					currentMonth = 0;
+					currentYear++;
+				}
+				generateCalendar(currentMonth, currentYear);
+			}
+
+			generateCalendar(currentMonth, currentYear);
+
+			document.getElementById('prevMonthBtn').addEventListener('click', previousMonth);
+			document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
+		});
+
+		function selectSubmit() {
+			const form = document.createElement('form');
+			form.setAttribute('method', 'post');
+			form.setAttribute('action', 'selectRecipe');
+
+			// 動的送信用のHidden
+			const inputField = document.createElement("input");
+			inputField.setAttribute("type", "hidden");
+			inputField.setAttribute("name", "select");
+			inputField.setAttribute("value", "select");
+
+			form.appendChild(inputField);
+
+			// フォームをDOMに追加
+			document.body.appendChild(form);
+
+			form.submit();
+		}
+
+	</script>
+</body>
+
+</html>

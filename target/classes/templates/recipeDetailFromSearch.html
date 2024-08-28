@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+	<title>recipeDetailFromSearch</title>
+	<script th:src="@{/js/common.js}"></script>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+	<link rel="stylesheet" href="../static/css/temp.css" />
+	<link rel="stylesheet" href="../static/css/recipeDetail.css" />
+	<link rel="stylesheet" th:href="@{/css/temp.css}" />
+	<link rel="stylesheet" th:href="@{/css/recipeDetail.css}" />
+</head>
+
+<body>
+	<!-- header -->
+	<nav class="navbar sticky-top navbar-expand-lg bg-body-tertiary border-bottom p-4"
+		style="background-color: #ffffff;">
+		<div class="container-fluid">
+			<a class="navbar-brand" th:href="@{/recommend}" style="font-size: 40px">CookUp</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+				<ul class="navbar-nav mb-2 mb-lg-0">
+					<!-- classに"active"とつけてあげると、その項目は強調表示されます。このテンプレの場合は「Myレシピ」が強調表示されてます" -->
+					<!-- hrefでjsを呼んでます。あくまで例なので修正の必要はありそう。 -->
+					<li class="nav-item p-2 h4">
+						<form>
+							<input type="hidden" name="select" value="検索"> <a class="nav-link "
+								href="javascript:selectSubmit()">検索</a>
+						</form>
+
+						<div id="timer" class="timertext">00 : 00</div> <!-- ボタンコントロール部分 -->
+
+					</li>
+					<!-- ここから下はsubmitになっていない(画面遷移の確認だけしている)ため、適宜上を真似して実装してみてください。変更したらご一報ください。 -->
+					<li class="nav-item p-2 h4">
+						<form>
+							<input type="hidden" name="#" value="Myレシピ"> <a class="nav-link" aria-current="page"
+								th:href="@{/Myrecipe}">Myレシピ</a>
+						</form>
+						<div class="box">
+							<button class="btn btn-primary btn-lg sign1" id="min">分</button>
+							<button type="button" class="btn btn-primary btn-lg sign1" id="sec">秒</button>
+						</div>
+
+					</li>
+					<li class="nav-item p-2 h4">
+						<form>
+							<input type="hidden" name="#" value="投稿"> <a class="nav-link" aria-current="page"
+								th:href="@{/insertRecipeInput}">投稿</a>
+						</form>
+						<div class="box">
+							<button type="button" class="btn btn-primary btn-lg sign1" id="start">▶</button>
+							<button type="button" class="btn btn-primary btn-lg sign1" id="reset">↻</button>
+						</div> <audio src="sound/電子レンジでチン.mp3" id="sound"></audio>
+
+					</li>
+					<li class="nav-item p-2 h4">
+						<form>
+							<input type="hidden" name="#" value="カレンダー"> <a class="nav-link" aria-current="page"
+								th:href="@{/calendar}">カレンダー</a>
+						</form>
+					</li>
+					<li class="nav-item p-2 h4">
+						<button type="button" onclick="logoutSubmit()"
+							class="btn btn-primary btn-lg sign">ログアウト</button>
+					</li>
+					<li class="nav-item p-2 h4" style="margin-top: -26px;margin-left: -20px;">
+						<img th:src="@{${userIcon}}" alt="icon" width="100" height="100">
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- /header -->
+
+	<th:block th:if="${messageInfo != null}">
+		<script th:inline="javascript">
+			alert([[${messageInfo.message}]]);
+		</script>
+	</th:block>
+
+	<main>
+		<table style="width: 30%;background-color: #ffefe0;margin-right: -10px;margin-bottom: -30px;text-align: right;">
+			<tr>
+				<td>
+					<form action="insertCalendar" method="post" th:object="${myRecipeSearchForm}">
+						<input type="hidden" name="idUser" th:value="${session.loginUser.idUser}">
+						<input type="hidden" th:field="*{idRecipe}">
+						<input type="hidden" th:field="*{idGenre}">
+						<input type="hidden" th:field="*{nmRecipe}">
+						<input type="hidden" th:field="*{picRecipe}">
+						<input type="hidden" th:field="*{ingRecipe}">
+						<input type="hidden" th:field="*{levelRecipe}">
+						<input type="hidden" th:field="*{howCook}">
+						<input type="hidden" th:field="*{cookTime}">
+						<input type="hidden" th:field="*{updateDate}">
+						<input type="hidden" th:field="*{delFlg}">
+						<!-- 遷移画面情報格納 -->
+						<input type="hidden" name="previousScreen" th:value="recipeDetailFromSearch">
+						<input type="submit" value="カレンダーに追加" />
+					</form>
+				</td>
+
+			</tr>
+		</table>
+
+		<form action="#" method="post" th:object="${myRecipeSearchForm}">
+
+			<!-- 料理名 -->
+			<div class="container">
+				<h2>
+					<span class="uline" th:text="*{nmRecipe}"></span>
+				</h2>
+			</div>
+			<!-- カテゴリ -->
+			<h3 th:text="カテゴリー" />
+			<tr>
+				<td>
+					<select class="readonly-select" name="idGenre" readonly="readonly" th:field="*{idGenre}" disabled>
+						<th:block th:each="genre : ${genreFormList}">
+							<th:block
+								th:if="${myRecipeSearchForm.idGenre != null && genre.idGenre == myRecipeSearchForm.idGenre}">
+								<option th:text="${genre.nmGenre}" th:value="${genre.idGenre}">
+								</option>
+							</th:block>
+						</th:block>
+					</select>
+				</td>
+			</tr>
+
+			<!-- 難易度 -->
+			<h3 th:text="難易度" />
+			<tr>
+				<td>
+					<select class="readonly-select" name="levelRecipe" th:field="*{levelRecipe}" disabled>
+						<option value="1" th:text="簡単" th:selected="${myRecipeSearchForm.levelRecipe == 1}">
+						</option>
+						<option value="2" th:text="少し簡単" th:selected="${myRecipeSearchForm.levelRecipe == 2}">
+						</option>
+						<option value="3" th:text="ふつう" th:selected="${myRecipeSearchForm.levelRecipe == 3}">
+						</option>
+						<option value="4" th:text="少し難しい" th:selected="${myRecipeSearchForm.levelRecipe == 4}">
+						</option>
+						<option value="5" th:text="難しい" th:selected="${myRecipeSearchForm.levelRecipe == 5}">
+						</option>
+					</select>
+				</td>
+			</tr>
+
+			<!-- 調理時間 -->
+			<table>
+
+				<h3 th:text="調理時間" />
+				<table style="width: 10%;">
+					<tr>
+						<td style="border: 1px solid #ccc;padding: 8px;">
+							<h4 th:text="*{cookTime}+ '分' " />
+						</td>
+					</tr>
+				</table>
+
+
+				<br>
+
+				<!-- 料理画像 -->
+				<h3 th:text="画像" />
+				<label>
+					<input type="hidden" id="picRecipe" name="picRecipe" th:value="*{picRecipe}" />
+					<img th:src="@{'/img/Recipe/'+ *{picRecipe}}" alt="画像"
+						style="width:600px;max-width:600px;max-height:600px;" />
+				</label><br>
+
+				<!-- 材料 -->
+				<h3 th:text="材料" />
+
+				<div class="table-container">
+					<table style="max-width: 50%;">
+						<tr>
+							<td style="border: 1px solid #ccc;padding: 10px;">
+								<h4 th:each="ingRecipe : ${ingRecipeList}" th:text="${ingRecipe}"></h4>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<br>
+
+				<!-- 作り方 -->
+				<h3 th:text="作り方" />
+
+				<div class="table-container">
+					<table style="text-align: left;">
+						<tr>
+							<td style="border: 1px solid #ccc;padding: 10px;padding-left: 20px;">
+								<h4 th:each="howCook : ${howCookList}" th:text="${howCook}"></h4>
+							</td>
+						</tr>
+					</table>
+				</div><br>
+
+		</form>
+		<!-- レビュー -->
+		<h3 th:text="レビュー" />
+
+		<div class="table-container">
+			<table>
+
+				<th:block th:if="${reviewFormList != null and reviewFormList.size() > 0}">
+					<tr th:each="recipeReviewForm : ${reviewFormList}">
+						<td style="width: 300px;border: 1px solid #ccc;padding-left: 30px;">
+
+							<th:field="*{myRecipeSearchForm.idUser}">
+								<option value=""></option>
+								<!-- ユーザー名表示 -->
+								<option th:each="loginUserForm : ${userFormList}"
+									th:if="${recipeReviewForm.idUser != null && loginUserForm.idUser == recipeReviewForm.idUser}"
+									th:value="${loginUserForm.idUser}" style="font-size: 26px;"
+									th:text="${loginUserForm.nmUser}">
+								</option>
+								<!-- ユーザーアイコン表示 -->
+								<div th:each="loginUserForm : ${userFormList}"
+									th:if="${recipeReviewForm.idUser != null && loginUserForm.idUser == recipeReviewForm.idUser}">
+									<img th:src="@{${loginUserForm.iconUser}}" alt="画像"
+										style="width:50px;max-width:50px;max-height:50px;" />
+								</div>
+								<h4 th:text="${recipeReviewForm.postDate}" style="font-size: 16px;"></h4><br>
+						</td>
+
+						<td style="border: 1px solid #ccc;padding-left: 20px;">
+							<h4 th:text="${recipeReviewForm.review}" style="font-size: 20px;"></h4><br>
+						</td>
+					</tr>
+
+				</th:block>
+			</table>
+		</div>
+
+		<table style="width: 30%;background-color: #ffefe0;">
+			<tr>
+				<td>
+					<form action="recipeReviewInput" method="post" th:object="${recipeReviewForm}">
+
+						<!-- ユーザーIDの隠しフィールド${session.getAttribute('idUser')} -->
+						<input type="hidden" name="idUser" th:value="${session.loginUser.idUser}">
+
+
+						<!-- レシピIDの隠しフィールド ${myRecipeSearchForm.idRecipe}-->
+						<input type="hidden" name="idRecipe" th:value="${myRecipeSearchForm.idRecipe}">
+
+						<!-- レビューの隠しフィールド -->
+						<input type="hidden" th:field="*{review}" value="">
+
+						<!-- 投稿日の隠しフィールド -->
+						<input type="hidden" name="postDate"
+							th:value="${#calendars.format(#calendars.createNowForTimeZone('Asia/Tokyo'), 'yyyy/MM/dd')}">
+
+						<!-- 遷移画面情報格納 -->
+						<input type="submit" value="レビューする" style="margin-left: 30px;">
+						<input type="hidden" name="previousScreen" th:value="recipeDetailFromSearch">
+					</form>
+
+
+				</td>
+
+
+				<td>
+					<!-- 検索画面に戻る -->
+					<form action="selectRecipe" method="post" th:object"${selectRecipe}">
+						<button type="submit"
+							style="background-color: #dc3545;margin-top: 50px; margin-bottom: 30px;margin-right: 30px;padding: 10px 16px;text-align: center;"
+							onmouseover="this.style.backgroundColor='rgb(154, 27, 39)';"
+							onmouseout="this.style.backgroundColor='#dc3545';">検索へ</button>
+					</form>
+				</td>
+
+			</tr>
+		</table>
+	</main>
+	<!-- footer -->
+	<footer>
+		<p>© 2024 CookUp</p>
+	</footer>
+
+</body>
+
+<script type="text/javascript">
+	//即時関数
+	(function () {
+		var timer = document.getElementById('timer');
+		var min = document.getElementById('min');
+		var sec = document.getElementById('sec');
+		var reset = document.getElementById('reset');
+		var start = document.getElementById('start');
+
+		// スタートを押した時の時間を入れる変数
+		var startTime;
+
+		// 残り時間を計算するための変数
+		var timeLeft;
+
+		// 現在時刻と表示形式を合わせるために * 1000
+		var timeToCountDown = 0;
+
+		// clearTimeoutメソッドを使いたいので、その時用に変数定義
+		var timerId;
+
+		// カウントダウンの状態を管理できるようにする
+		var isRunning = false;
+
+		// 残り時間を表示するために、ミリ秒を渡すと、分や秒に直してくれる関数
+		function updateTimer(t) {
+
+			// 引数として渡されたtでデータオブジェクトを作りたいので変数dという変数名で作ってみる
+			var d = new Date(t);
+			var m = d.getMinutes();
+			var s = d.getSeconds();
+			m = ('  0' + m).slice(-2);
+			s = ('  0' + s).slice(-2);
+			timer.textContent = m + ' : ' + s;
+
+		}
+
+		function countDown() {
+
+			// 10ミリ秒後に実行する
+			timerId = setTimeout(function () {
+
+				// 残り時間 = カウントされる時間 - 現在時刻
+				timeLeft = timeToCountDown - (Date.now() - startTime);
+
+				// 残り時間が0になった時の処理
+				if (timeLeft < 0) {
+					//音を鳴らすための処理
+					document.getElementById("sound").play();
+
+					isRunning = false;
+					start.textContent = '▶';
+					clearTimeout(timerId);
+					timeLeft = 0;
+
+					timeToCountDown = 0;
+
+					updateTimer(timeLeft);
+
+					return;
+				}
+
+				// countDownを再帰的に呼び出すために記述
+				updateTimer(timeLeft)
+				countDown();
+
+			}, 10);
+		}
+
+		// スタートを押したときの処理
+		start.addEventListener('click', function () {
+
+			if (isRunning === false) {
+				isRunning = true;
+
+				start.textContent = '❚❚';
+
+				startTime = Date.now();
+
+				// カウントダウンの機能は再帰的に実行
+				countDown();
+			} else {
+				isRunning = false;
+
+				// 表記をStartに戻す
+				start.textContent = '▶';
+
+				// この時点のtimeLeftで更新してあげる
+				timeToCountDown = timeLeft;
+
+				// カウントを止めたいのでclearTimeoutする
+				clearTimeout(timerId);
+			}
+		});
+
+		// 分を押した時の処理
+		min.addEventListener('click', function () {
+
+			// カウントダウン中に設定時間を変更できないようにする
+			if (isRunning === true) {
+				return;
+			}
+
+			// 分 = 60秒なので
+			timeToCountDown += 60 * 1000;
+
+			// 60分、60秒を超えたら0にする
+			if (timeToCountDown >= 60 * 60 * 1000) {
+				timeToCountDown = 0;
+			}
+
+			// timeToCountDownをtimerに反映させたいのでupDatetimerを使う
+			updateTimer(timeToCountDown);
+		});
+
+		// 秒を押した時の処理
+		sec.addEventListener('click', function () {
+
+			// カウントダウン中に設定時間を変更できないようにする
+			if (isRunning === true) {
+				return;
+			}
+
+			// 1秒なので
+			timeToCountDown += 10 * 1000;
+
+			if (timeToCountDown >= 60 * 60 * 1000) {
+				timeToCountDown = 0;
+			}
+
+			// timeToCountDownをtimerに反映させたいのでupDatetimerを使う
+			updateTimer(timeToCountDown);
+		});
+
+		// リセットを押した時の処理
+		reset.addEventListener('click', function () {
+
+			// カウントダウン中に設定時間を変更できないようにする
+			if (isRunning === true) {
+				return;
+			}
+
+			timeToCountDown = 0;
+
+			// timeToCountDownをtimerに反映させたいのでupDatetimerを使う
+			updateTimer(timeToCountDown);
+		});
+	})();
+
+
+	function selectSubmit() {
+		const form = document.createElement('form');
+		form.setAttribute('method', 'post');
+		form.setAttribute('action', 'selectRecipe');
+
+		// 動的送信用のHidden
+		// 動的にFormを作成する場合は何かしら送信しないと、正しく動作しない
+		const inputField = document.createElement("input");
+		inputField.setAttribute("type", "hidden");
+		inputField.setAttribute("value", "select");
+
+		form.appendChild(inputField);
+
+		// フォームをDOMに追加
+		document.body.appendChild(form);
+
+		form.submit();
+	}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+	crossorigin="anonymous"></script>
+
+</html>

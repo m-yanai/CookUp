@@ -1,0 +1,28 @@
+@charset "UTF-8";
+
+main {
+	max-width: 90%;
+	margin: 60px auto;
+	background-color: #ffefe0;
+	padding: 100px;
+	border-radius: 8px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+main h1{
+	font-size: 50px;
+	margin-top: 50px; /* 上部のマージンを追加 */
+}
+
+
+table {
+	border-collapse: collapse;
+	width: 30%;
+	margin: 30px auto;
+}
+
+
+.form-inline {
+    display: inline;
+}
+
+

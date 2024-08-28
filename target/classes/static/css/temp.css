@@ -1,0 +1,40 @@
+@charset "UTF-8";
+
+.navbar-brand{
+	color: #E33700;
+}
+
+.sign{
+	background-color: #E33700;
+	border: 1px solid transparent;
+}
+
+.sign:hover {
+  background-color: #ffffff;
+  color: #E33700;
+  border: 1px solid;
+  border-color: #E33700;
+}
+
+.nav-link{
+	color: #aaaaaa;
+}
+
+.nav-link:hover{
+	color: #555555;
+}
+
+footer{
+	top: 100vh;
+	position: sticky;
+	margin-left: 5%;
+	margin-right: 5%;
+	border-top: 1px solid;
+	border-color: #cccccc;
+	text-align: center;
+	margin-top: 30px;
+}
+
+footer p{
+	margin-top: 12px;
+}
